@@ -1,0 +1,67 @@
+{
+  "project_info": {
+    "project_number": "577940966084",
+    "project_id": "squareone-a6d26",
+    "storage_bucket": "squareone-a6d26.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:577940966084:android:87463b4b51c04e896e1791",
+        "android_client_info": {
+          "package_name": "com.example.square1_user"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDQKVVpZI_7rOt8c0NTnLZ9-2usOBRlud8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:577940966084:android:1d7c3cff1ad98c2e6e1791",
+        "android_client_info": {
+          "package_name": "com.innovativewidget.squareoneadmin"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDQKVVpZI_7rOt8c0NTnLZ9-2usOBRlud8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:577940966084:android:e415f55910e16b0f6e1791",
+        "android_client_info": {
+          "package_name": "com.innovativewidget.squareonesupport"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDQKVVpZI_7rOt8c0NTnLZ9-2usOBRlud8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

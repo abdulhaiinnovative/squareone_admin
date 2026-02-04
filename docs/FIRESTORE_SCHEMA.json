@@ -1,0 +1,59 @@
+{
+  "Outlets": {
+    "Outlet Name": "string",
+    "POC": "string",
+    "Contact Number": "string",
+    "Email": "string",
+    "Password": "string",
+    "status": "string",
+    "token": "string|array",
+    "outlet type": "string"
+  },
+  "Depart Members": {
+    "Name": "string",
+    "Contact Number": "string",
+    "Email": "string",
+    "Password": "string",
+    "Department": "string",
+    "token": "string|array"
+  },
+  "Emergency Tickets": {
+    "Department": "string",
+    "Outlet Name": "string",
+    "Item": "string",
+    "header": "string",
+    "Partiular": "string",
+    "Type": "string",
+    "Quantity": "string",
+    "Contact": "string",
+    "Time": "string",
+    "Date": "string",
+    "POC": "string",
+    "Opened By": "string",
+    "Status": "string",
+    "User ID": "string",
+    "Creation Time": "Timestamp",
+    "Approval Time": "Timestamp",
+    "Apprved By": "string",
+    "Ticket Number": "string"
+  },
+  "Notification": {
+    "subject": "string",
+    "description": "string",
+    "time": "Timestamp",
+    "file": "null|{name:string,url:string}"
+  },
+  "Approval-Notification": {
+    "subject": "string",
+    "description": "string",
+    "time": "Timestamp",
+    "file": "null|{name:string,url:string}"
+  },
+  "Tickets": {
+    "Status": "string",
+    "Department": "string",
+    "Date": "string",
+    "Outlet": "string",
+    "Ticket By": "string"
+  }
+}

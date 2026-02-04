@@ -1,0 +1,40 @@
+"Cost per conversation in USD, effective June 1, 2023",,,,,,
+"Note: Authentication-International rate applies for Indonesia as of June 1, 2024 and India as of July 1, 2024. Learn more: https://developers.facebook.com/docs/whatsapp/pricing/authentication-international-rates.",,,,,,
+"Note: Utility rates below apply as of August 1, 2024.",,,,,,
+"Note: Marketing rates below apply as of October 1, 2024.",,,,,,
+"Note: Service conversations are free as of November 1, 2024. Learn more: https://developers.facebook.com/docs/whatsapp/pricing/updates-to-pricing#free-service-conversations.",,,,,,
+"Note: Utility rate below applies for Rest of Africa as of November 1, 2024.",,,,,,
+Market,Currency,Marketing,Utility,Authentication,"Authentication-
+International",Service
+Argentina,$US,0.0618,0.0340,0.0367,n/a,n/a
+Brazil,$US,0.0625,0.0080,0.0315,n/a,n/a
+Chile,$US,0.0889,0.0200,0.0527,n/a,n/a
+Colombia,$US,0.0125,0.0002,0.0077,n/a,n/a
+Egypt,$US,0.1073,0.0052,0.0618,n/a,n/a
+France,$US,0.1432,0.0300,0.0691,n/a,n/a
+Germany,$US,0.1365,0.0550,0.0768,n/a,n/a
+India,$US,0.0107,0.0014,0.0014,0.0280,n/a
+Indonesia,$US,0.0411,0.0200,0.0300,0.1360,n/a
+Israel,$US,0.0353,0.0053,0.0169,n/a,n/a
+Italy,$US,0.0691,0.0300,0.0378,n/a,n/a
+Malaysia,$US,0.0860,0.0140,0.0180,n/a,n/a
+Mexico,$US,0.0436,0.0100,0.0239,n/a,n/a
+Netherlands,$US,0.1597,0.0500,0.0720,n/a,n/a
+Nigeria,$US,0.0516,0.0067,0.0287,n/a,n/a
+Pakistan,$US,0.0473,0.0054,0.0228,n/a,n/a
+Peru,$US,0.0703,0.0200,0.0377,n/a,n/a
+Russia,$US,0.0802,0.0400,0.0429,n/a,n/a
+Saudi Arabia,$US,0.0455,0.0115,0.0226,n/a,n/a
+South Africa,$US,0.0379,0.0076,0.0180,n/a,n/a
+Spain,$US,0.0615,0.0200,0.0342,n/a,n/a
+Turkey,$US,0.0109,0.0053,0.0083,n/a,n/a
+United Arab Emirates,$US,0.0384,0.0157,0.0178,n/a,n/a
+United Kingdom,$US,0.0529,0.0220,0.0358,n/a,n/a
+North America,$US,0.0250,0.0040,0.0135,n/a,n/a
+Rest of Africa,$US,0.0225,0.0040,0.0144,n/a,n/a
+Rest of Asia Pacific,$US,0.0732,0.0157,0.0425,n/a,n/a
+Rest of Central & Eastern Europe,$US,0.0860,0.0353,0.0557,n/a,n/a
+Rest of Latin America,$US,0.0740,0.0113,0.0445,n/a,n/a
+Rest of Middle East,$US,0.0341,0.0157,0.0178,n/a,n/a
+Rest of Western Europe,$US,0.0592,0.0300,0.0378,n/a,n/a
+Other,$US,0.0604,0.0077,0.0304,n/a,n/a

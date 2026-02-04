@@ -1,0 +1,7 @@
+flutter analyze output (run on Dec 24, 2025):
+
+Analyzing square_Admin_test...
+
+No issues found!
+
+Note: Run `flutter analyze` locally to reproduce; results may change as code changes.
