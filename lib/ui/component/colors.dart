@@ -7,8 +7,10 @@ import 'package:squareone_admin/ui/views/home/marketing/marketing_view.dart';
 import 'package:squareone_admin/ui/views/home/security/security_view.dart';
 import 'package:squareone_admin/ui/views/notifications/notifications_view.dart';
 import 'package:squareone_admin/ui/views/profile/profile_view.dart';
+import 'package:squareone_admin/ui/views/team_availability_dashboard.dart';
 
 import '../views/home/admin/home_view.dart';
+import '../views/home/head/head_home.dart';
 
 const Color redColor = Color(0xffC12934);
 const Color greenColor = Color(0xFFDEFFE5);
@@ -177,6 +179,48 @@ List emergencyCardImages = [
   'assets/home/gate_pass_outward.svg',
   'assets/home/non_retail.svg',
   'assets/home/maintenance.svg',
+];
+List<SalomonBottomBarItem> headItems = [
+  SalomonBottomBarItem(
+    icon: const Icon(Icons.home_outlined),
+    title: const Text(
+      'Home',
+      style: TextStyle(
+        fontSize: 13,
+        fontWeight: FontWeight.w400,
+      ),
+    ),
+  ),
+  SalomonBottomBarItem(
+    icon: const Icon(Icons.notifications_none),
+    title: const Text(
+      'Notification',
+      style: TextStyle(
+        fontSize: 13,
+        fontWeight: FontWeight.w400,
+      ),
+    ),
+  ),
+  SalomonBottomBarItem(
+    icon: const Icon(Icons.groups_3_outlined),
+    title: const Text(
+      'Workers',
+      style: TextStyle(
+        fontSize: 13,
+        fontWeight: FontWeight.w400,
+      ),
+    ),
+  ),
+  SalomonBottomBarItem(
+    icon: const Icon(Icons.account_circle_outlined),
+    title: const Text(
+      'Profile',
+      style: TextStyle(
+        fontSize: 13,
+        fontWeight: FontWeight.w400,
+      ),
+    ),
+  ),
 ];
 List<SalomonBottomBarItem> adminItems = [
   SalomonBottomBarItem(
@@ -355,6 +399,13 @@ final adminPages = [
   const HomeView(),
   const NotificationsView(),
   const AddDepartmentView(),
+  const ProfileView(),
+];
+
+final headPages = [
+  const HeadHome(),
+  const NotificationsView(),
+  const TeamAvailabilityDashboard(),
   const ProfileView(),
 ];
 

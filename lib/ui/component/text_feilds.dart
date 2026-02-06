@@ -9,7 +9,7 @@ Container textField(
   isEmail = false,
   isKeyboard = false,
   double left = 24,
-  double right = 24,
+  double right = 24, bool readOnly = false, Future<void> Function()? onTap,
  
 }) {
   return Container(
@@ -38,6 +38,8 @@ Container textField(
                       offset: const Offset(3, 5))
                 ]),
             child: TextFormField(
+              onTap: onTap,
+              readOnly: readOnly,
               controller: controller,
               maxLines: maxLines,
               keyboardType: isKeyboard
