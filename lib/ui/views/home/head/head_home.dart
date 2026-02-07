@@ -19,6 +19,7 @@ import '../../../component/assign_new_task_card.dart';
 import '../../../component/metric_card.dart';
 import '../../../component/section_title.dart';
 import 'head_home_controller.dart';
+import 'assign_ticket_view.dart';
 
 class HeadHome extends StatefulWidget {
   const HeadHome({super.key});
@@ -134,7 +135,7 @@ class _HeadHomeState extends State<HeadHome> {
                               // Active Tasks Card
                               MetricCard(
                                 onTap: (){
-                                  Navigator.push(context, MaterialPageRoute(builder: (context) => ShiftManagementView()));
+
                                 },
                                 title: 'Active Tickets',
                                 count: controller.activeTasksCount,
@@ -157,7 +158,7 @@ class _HeadHomeState extends State<HeadHome> {
                               // Completed Tasks Card
                               MetricCard(
                                 onTap: () async {
-                                  await Get.find<LoginController>().logout();
+                                  Navigator.push(context, MaterialPageRoute(builder: (context) => ShiftManagementView()));
                                 },
                                 title: 'Completed',
                                 count: controller.completedTasksCount,
@@ -192,9 +193,9 @@ class _HeadHomeState extends State<HeadHome> {
                       controller: controller,
                       height: height,
                       width: width,
-                      title: 'Assign New Task',
-                      subTitle: 'Create and assign tasks',
-                      function: () => Get.to(() => const AddDepartmentView()),
+                      title: 'Assign New Ticket',
+                      subTitle: 'Create and assign tickets',
+                      function: () => Get.to(() => AssignTicketView(controller: controller)),
                     ),
                     // ========== PENDING APPROVALS SECTION ==========
                     if (controller.pendingApprovals.isNotEmpty)
@@ -246,32 +247,66 @@ class _HeadHomeState extends State<HeadHome> {
 
                               const SizedBox(height: 10),
 
-                              /// Content
+                              /// Content - Show 1 task (or all if expanded)
                               Obx(
-                                    () => controller.activeTasks.isEmpty
-                                    ? Container(
-                                  padding: const EdgeInsets.symmetric(vertical: 24),
-                                  alignment: Alignment.center,
-                                  child: const Text(
-                                    'No active tasks',
-                                    style: TextStyle(
-                                      color: Colors.grey,
-                                      fontSize: 14,
+                                    () {
+                                  final displayCount = controller.expandTasks.value
+                                      ? controller.activeTasks.length
+                                      : (controller.activeTasks.length > 1 ? 1 : controller.activeTasks.length);
+
+                                  return controller.activeTasks.isEmpty
+                                      ? Container(
+                                    padding: const EdgeInsets.symmetric(vertical: 24),
+                                    alignment: Alignment.center,
+                                    child: const Text(
+                                      'No active tasks',
+                                      style: TextStyle(
+                                        color: Colors.grey,
+                                        fontSize: 14,
+                                      ),
                                     ),
-                                  ),
-                                )
-                                    : ListView.separated(
-                                  shrinkWrap: true,
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  itemCount: controller.activeTasks.length,
-                                  separatorBuilder: (_, __) =>
-                                  const SizedBox(height: 8),
-                                  itemBuilder: (context, index) {
-                                    var task = controller.activeTasks[index];
-                                    return _buildActiveTaskCard(task);
-                                  },
-                                ),
+                                  )
+                                      : ListView.separated(
+                                    shrinkWrap: true,
+                                    physics: const NeverScrollableScrollPhysics(),
+                                    itemCount: displayCount,
+                                    separatorBuilder: (_, __) =>
+                                    const SizedBox(height: 8),
+                                    itemBuilder: (context, index) {
+                                      var task = controller.activeTasks[index];
+                                      return _buildActiveTaskCard(task);
+                                    },
+                                  );
+                                },
                               ),
+
+                              /// Expand/Collapse Button
+                              Obx(() {
+                                if (controller.activeTasks.length > 1) {
+                                  return Padding(
+                                    padding: const EdgeInsets.only(top: 12),
+                                    child: Center(
+                                      child: ElevatedButton.icon(
+                                        onPressed: () {
+                                          controller.expandTasks.value = !controller.expandTasks.value;
+                                        },
+                                        icon: Icon(
+                                          controller.expandTasks.value ? Icons.expand_less : Icons.expand_more,
+                                          size: 18,
+                                        ),
+                                        label: Text(
+                                          controller.expandTasks.value ? 'Show Less' : 'View All Tasks (${controller.activeTasks.length})',
+                                        ),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: const Color(0xFF27BB4A),
+                                          foregroundColor: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                }
+                                return const SizedBox.shrink();
+                              }),
                             ],
                           ),
                         ),
@@ -298,33 +333,66 @@ class _HeadHomeState extends State<HeadHome> {
 
                               const SizedBox(height: 10),
 
-                              /// Content
+                              /// Content - Show 3 employees (or all if expanded)
                               Obx(
-                                    () => controller.onShiftEmployees.isEmpty
-                                    ? Container(
-                                  padding: const EdgeInsets.symmetric(vertical: 24),
-                                  alignment: Alignment.center,
-                                  child: const Text(
-                                    'No employees on shift currently',
-                                    style: TextStyle(
-                                      color: Colors.grey,
-                                      fontSize: 14,
+                                    () {
+                                  final displayCount = controller.expandEmployees.value
+                                      ? controller.onShiftEmployees.length
+                                      : (controller.onShiftEmployees.length > 3 ? 3 : controller.onShiftEmployees.length);
+
+                                  return controller.onShiftEmployees.isEmpty
+                                      ? Container(
+                                    padding: const EdgeInsets.symmetric(vertical: 24),
+                                    alignment: Alignment.center,
+                                    child: const Text(
+                                      'No employees on shift currently',
+                                      style: TextStyle(
+                                        color: Colors.grey,
+                                        fontSize: 14,
+                                      ),
                                     ),
-                                  ),
-                                )
-                                    : ListView.separated(
-                                  shrinkWrap: true,
-                                  physics: const NeverScrollableScrollPhysics(),
-                                  itemCount: controller.onShiftEmployees.length,
-                                  separatorBuilder: (_, __) =>
-                                  const SizedBox(height: 8),
-                                  itemBuilder: (context, index) {
-                                    var employee =
-                                    controller.onShiftEmployees[index];
-                                    return _buildEmployeeCard(employee);
-                                  },
-                                ),
+                                  )
+                                      : ListView.separated(
+                                    shrinkWrap: true,
+                                    physics: const NeverScrollableScrollPhysics(),
+                                    itemCount: displayCount,
+                                    separatorBuilder: (_, __) =>
+                                    const SizedBox(height: 8),
+                                    itemBuilder: (context, index) {
+                                      var employee = controller.onShiftEmployees[index];
+                                      return _buildEmployeeCard(employee);
+                                    },
+                                  );
+                                },
                               ),
+
+                              /// Expand/Collapse Button
+                              Obx(() {
+                                if (controller.onShiftEmployees.length > 3) {
+                                  return Padding(
+                                    padding: const EdgeInsets.only(top: 12),
+                                    child: Center(
+                                      child: ElevatedButton.icon(
+                                        onPressed: () {
+                                          controller.expandEmployees.value = !controller.expandEmployees.value;
+                                        },
+                                        icon: Icon(
+                                          controller.expandEmployees.value ? Icons.expand_less : Icons.expand_more,
+                                          size: 18,
+                                        ),
+                                        label: Text(
+                                          controller.expandEmployees.value ? 'Show Less' : 'View All Employees',
+                                        ),
+                                        style: ElevatedButton.styleFrom(
+                                          backgroundColor: redColor,
+                                          foregroundColor: Colors.white,
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                }
+                                return const SizedBox.shrink();
+                              }),
                             ],
                           ),
                         ),
@@ -606,7 +674,7 @@ class _HeadHomeState extends State<HeadHome> {
         child: Row(
           children: [
             CircleAvatar(
-              backgroundColor: Color(0xFF27BB4A),
+              backgroundColor: redColor,
               child: Text(
                 (employee['name'] ?? 'U')[0].toUpperCase(),
                 style:
@@ -627,7 +695,7 @@ class _HeadHomeState extends State<HeadHome> {
                   ),
                   SizedBox(height: 4),
                   Text(
-                    'Shift: ${employee['shiftStart'] ?? 'N/A'} - ${employee['shiftEnd'] ?? 'N/A'}',
+                    'Shift: ${employee['shifts']?[0]?['start_time'] ?? 'N/A'} - ${employee['shifts']?[0]?['end_time'] ?? 'N/A'}',
                     style: TextStyle(
                       fontSize: 12,
                       color: Colors.grey,
@@ -639,14 +707,14 @@ class _HeadHomeState extends State<HeadHome> {
             Container(
               padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
-                color: Color(0xFF27BB4A).withOpacity(0.2),
+                color: redColor.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
                 'On Shift',
                 style: TextStyle(
                   fontSize: 11,
-                  color: Color(0xFF27BB4A),
+                  color: redColor,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -790,13 +858,9 @@ class _HeadHomeState extends State<HeadHome> {
                         }
                         await controller.assignTaskToEmployee(
                           taskTitle: taskTitleController.text,
-                          category: selectedCategory,
+                          taskDescription: 'Category: $selectedCategory${dueDateController.text.isNotEmpty ? '\nDue Date: ${dueDateController.text}' : ''}\nPriority: $selectedPriority',
                           employeeId: selectedEmployeeId,
                           employeeName: selectedEmployeeName,
-                          dueDate: dueDateController.text.isNotEmpty
-                              ? dueDateController.text
-                              : null,
-                          priority: selectedPriority,
                         );
                         Navigator.pop(context);
                       },
@@ -1049,13 +1113,9 @@ void _showAssignTaskDialog(
                 }
                 await controller.assignTaskToEmployee(
                   taskTitle: taskTitleController.text,
-                  category: selectedCategory,
+                  taskDescription: 'Category: $selectedCategory${dueDateController.text.isNotEmpty ? '\nDue Date: ${dueDateController.text}' : ''}\nPriority: $selectedPriority',
                   employeeId: selectedEmployeeId,
                   employeeName: selectedEmployeeName,
-                  dueDate: dueDateController.text.isNotEmpty
-                      ? dueDateController.text
-                      : null,
-                  priority: selectedPriority,
                 );
                 Navigator.pop(context);
               },

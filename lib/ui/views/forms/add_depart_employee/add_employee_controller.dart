@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
@@ -103,10 +104,25 @@ class AddDeptEmployeeController extends GetxController {
     try {
       final email = emailController.text.trim();
       final password = passwordController.text.trim();
-      final currentUserEmail = _auth.currentUser?.email ?? 'unknown';
+      final currentUser = FirebaseAuth.instance.currentUser;
 
-      // Step 1: Create user in Firebase Authentication
-      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+      final currentUserUid  = currentUser?.uid;          // ← best to use UID
+      final currentUserEmail = currentUser?.email ?? 'unknown';
+
+      // Step 1: Create user in Firebase Authentication using a secondary FirebaseApp
+      // This prevents the default app's currentUser from being replaced.
+      FirebaseApp secondaryApp;
+      try {
+        secondaryApp = Firebase.app('Secondary');
+      } catch (_) {
+        secondaryApp = await Firebase.initializeApp(
+          name: 'Secondary',
+          options: Firebase.app().options,
+        );
+      }
+
+      final secondaryAuth = FirebaseAuth.instanceFor(app: secondaryApp);
+      UserCredential userCredential = await secondaryAuth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
@@ -132,10 +148,19 @@ class AddDeptEmployeeController extends GetxController {
         'role': selectedRole.value,
         'status': 'Offline',
         'department_id': departmentName.value,
-        'added_by': currentUserEmail,
+        'added_by': currentUserUid,
+        'password': passwordController.text.trim(),
         'shifts': shiftsArray,
         'createdAt': FieldValue.serverTimestamp(),
       });
+
+      // Clean up secondary app/auth so it doesn't hold resources or affect state
+      try {
+        await secondaryAuth.signOut();
+        await secondaryApp.delete();
+      } catch (e) {
+        // ignore cleanup errors
+      }
 
       Get.snackbar(
         'Success',

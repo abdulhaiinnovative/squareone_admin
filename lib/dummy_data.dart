@@ -112,6 +112,55 @@ const Map<String, Map<String, dynamic>> personnel = {
   },
 };
 
+final Map<String, Map<String,dynamic>> tickets = {
+  'ticket_id' : {
+    // "parent_ticket_id": null,
+    // "is_subticket": false,
+
+    'ticket_title': 'Clean',
+    'ticket_description': "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum.",
+
+
+    "created_at": "2026-01-23T10:15:00+05:00",
+    "created_by": "user_id3",           // Alice (Head)
+    "created_by_role": "head",
+    "department_id": "${departments['department_id1']?['name']}",
+
+
+    "assigned_to": const {
+      "user_id": "user_id5",
+      "name": "Charlie Davis",
+      "role": "employee"
+    },          // Charlie (Employee)
+    "assigned_by": {
+      "user_id": "${personnel['user_id3']}",
+      "name": "${personnel['user_id3']?['name']}",
+      "role": "${personnel['user_id3']?['role']}",
+      "assigned_at": "2026-01-23T10:18:00+05:00",
+      // head | Admin | SuperAdmin
+    },
+
+
+    "status": "Assigned",
+    "completion": const {
+      "completed_at": null,
+      "images": [],
+      "remarks": null
+    },
+
+    "approved": null,
+    "approved_by": null,
+    "approved_at": null,
+    "feedback": null,
+    "feedback_rating": null,
+
+    "subtickets": const [],
+    "last_updated_at": "2026-01-23T10:20:00+05:00",
+    "last_updated_by": "user_id5"
+  },
+};
+
+
 // Mutable current employee for simple in-memory login simulation
 Map<String, dynamic>? currentEmployee;
 

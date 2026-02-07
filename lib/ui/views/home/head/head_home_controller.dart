@@ -12,6 +12,8 @@ class HeadHomeController extends GetxController {
   FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
 
   // User Info
+
+  RxString headUid = ''.obs;
   RxString headName = ''.obs;
   RxString departmentName = ''.obs;
 
@@ -33,13 +35,19 @@ class HeadHomeController extends GetxController {
   RxBool isLoading = false.obs;
   RxString selectedEmployeeId = ''.obs;
   RxString selectedEmployeeName = ''.obs;
+  RxBool expandEmployees = false.obs;
+  RxBool expandTasks = false.obs;
 
   @override
   void onInit() {
     super.onInit();
-    fetchHeadInfo();
-    fetchDepartmentEmployees();
-    fetchTaskStatistics();
+    fetchHeadInfo().then((_) {
+      if (departmentName.value.isNotEmpty && departmentName.value != 'Unknown Department') {
+        fetchDepartmentEmployees();
+        fetchTaskStatistics();
+      }
+    });
+
     // Refresh data every 30 seconds
     // ever(isLoading, (_) => refreshAllData());
   }
@@ -47,46 +55,61 @@ class HeadHomeController extends GetxController {
   /// Fetch head's information from Firestore
   Future<void> fetchHeadInfo() async {
     try {
-      String? currentEmail = FirebaseAuth.instance.currentUser?.email;
-      if (currentEmail != null) {
-        DocumentSnapshot doc = await firebaseFirestore
-            .collection('Depart Members')
-            .doc(currentEmail)
-            .get();
+      final currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser == null) {
+        headName.value = 'Not Logged In';
+        departmentName.value = 'Unknown';
+        return;
+      }
 
-        if (doc.exists) {
-          headName.value = doc['Name'] ?? 'Head';
-          departmentName.value = doc['Department'] ?? 'Unknown Department';
-        }
+      // Important: document ID UID hai, email nahi
+      final uid = currentUser.uid;
+
+      DocumentSnapshot doc = await firebaseFirestore
+          .collection('personnel')
+          .doc(uid)
+          .get();
+
+      if (doc.exists) {
+        headUid.value = uid;
+        headName.value = doc['name']?.toString().trim() ?? currentUser.email?.split('@')[0] ?? 'Head';
+        departmentName.value = doc['department_id']?.toString().trim() ?? 'Unknown Department';
+      } else {
+        headUid.value = uid;
+        headName.value = currentUser.email?.split('@')[0] ?? 'Head';
+        departmentName.value = 'Not Found';
+        print('No personnel document found for UID: $uid');
       }
     } catch (e) {
       print('Error fetching head info: $e');
+      headName.value = 'Error';
+      departmentName.value = 'Error';
     }
   }
 
-  /// Fetch all employees in the department
-  Future<void> fetchDepartmentEmployees() async {
+  /// Fetch all employees in the department from personnel collection
+  Future<void> fetchDepartmentEmployees({String? departmentId}) async {
     try {
-      String? department = departmentName.value;
-      if (department.isEmpty) return;
+      final department = (departmentId ?? departmentName.value).toString();
+      if (department.isEmpty || department == 'Unknown Department' || department == 'Unknown' || department == 'Not Found') return;
 
       QuerySnapshot snapshot = await firebaseFirestore
-          .collection('Depart Members')
-          .where('Department', isEqualTo: department)
-          .where('role', isEqualTo: 'Employee')
+          .collection('personnel')
+          .where('department_id', isEqualTo: department)
+          .where('role', isEqualTo: 'employee')
           .get();
 
       departmentEmployees.value = snapshot.docs.map((doc) {
+        final data = doc.data() as Map<String, dynamic>;
+
         return {
           'id': doc.id,
-          'name': doc['Name'] ?? 'Unknown',
-          'email': doc.id,
-          'role': doc['role'] ?? 'Employee',
-          'status': checkEmployeeOnlineStatus(doc['shifts']),
-          'shiftStart': doc['shiftStart'] ?? 'N/A',
-          'shiftEnd': doc['shiftEnd'] ?? 'N/A',
-          'availability': checkEmployeeOnlineStatus(doc['shifts']),
-          'shifts': doc['shifts'] ?? [],
+          'name': data['name'] ?? 'Unknown',
+          'email': data['email'] ?? '',
+          'role': data['role'] ?? 'employee',
+          'status': data['status'] ?? 'Offline',
+          'availability': checkEmployeeOnlineStatus(data['shifts']),
+          'shifts': data['shifts'] ?? [],
         };
       }).toList();
 
@@ -94,12 +117,12 @@ class HeadHomeController extends GetxController {
       onShiftEmployees.value = departmentEmployees
           .where((emp) => emp['availability'] == true)
           .toList();
+
       onShiftEmployeesCount.value = onShiftEmployees.length;
     } catch (e) {
       print('Error fetching employees: $e');
     }
   }
-
   /// Check if employee is currently online based on shifts array
   /// Returns true if today's date matches a shift date and current time is within shift hours
   /// Returns false otherwise
@@ -227,37 +250,40 @@ class HeadHomeController extends GetxController {
       String? department = departmentName.value;
       if (department.isEmpty) return;
 
+      print('DEBUG: Fetching tasks for department: $department');
+
       // Active Tasks
       QuerySnapshot activeDocs = await firebaseFirestore
           .collection('Tickets')
-          .where('Department', isEqualTo: department)
-          .where('Status', whereIn: ['Open', 'In Progress', 'Assigned'])
+          .where('department_id', isEqualTo: department)
+          .where('status', whereIn: ['Open', 'In Progress', 'Assigned'])
           .get();
       activeTasksCount.value = activeDocs.docs.length;
+      print('DEBUG: Found ${activeDocs.docs.length} active tasks');
 
       // Pending Approvals
       QuerySnapshot pendingDocs = await firebaseFirestore
           .collection('Tickets')
-          .where('Department', isEqualTo: department)
-          .where('Status', isEqualTo: 'Completed')
-          .where('Approval', isEqualTo: 'Pending')
+          .where('department_id', isEqualTo: department)
+          .where('status', isEqualTo: 'Completed')
+          .where('approved', isEqualTo: null)
           .get();
       pendingApprovalsCount.value = pendingDocs.docs.length;
       pendingApprovals.value = pendingDocs.docs.map((doc) {
         return {
           'id': doc.id,
-          'title': doc['Title'] ?? 'No Title',
-          'status': doc['Status'] ?? 'Unknown',
-          'assignee': doc['AssignedTo'] ?? 'Unassigned',
-          'completedAt': doc['CompletedAt'] ?? 'N/A',
+          'title': doc['ticket_title'] ?? 'No Title',
+          'status': doc['status'] ?? 'Unknown',
+          'assignee': (doc['assigned_to']?['name']) ?? 'Unassigned',
+          'completedAt': doc['completion']?['completed_at'] ?? 'N/A',
         };
       }).toList();
 
       // Completed Tasks
       QuerySnapshot completedDocs = await firebaseFirestore
           .collection('Tickets')
-          .where('Department', isEqualTo: department)
-          .where('Status', isEqualTo: 'Completed')
+          .where('department_id', isEqualTo: department)
+          .where('status', isEqualTo: 'Completed')
           .get();
       completedTasksCount.value = completedDocs.docs.length;
 
@@ -265,70 +291,88 @@ class HeadHomeController extends GetxController {
       activeTasks.value = activeDocs.docs.map((doc) {
         return {
           'id': doc.id,
-          'title': doc['Title'] ?? 'No Title',
-          'status': doc['Status'] ?? 'Open',
-          'priority': doc['Priority'] ?? 'Normal',
-          'dueDate': doc['DueDate'] ?? 'No date',
-          'assignedTo': doc['AssignedTo'] ?? 'Unassigned',
+          'title': doc['ticket_title'] ?? 'No Title',
+          'status': doc['status'] ?? 'Open',
+          'priority': doc['priority'] ?? 'Normal',
+          'dueDate': doc['due_date'] ?? 'No date',
+          'assignedTo': (doc['assigned_to']?['name']) ?? 'Unassigned',
         };
       }).toList();
+      print('DEBUG: Mapped ${activeTasks.value.length} active tasks for display');
     } catch (e) {
       print('Error fetching task statistics: $e');
     }
   }
 
-  /// Assign task to an employee
+  /// Assign ticket to an employee using correct schema
   Future<void> assignTaskToEmployee({
     required String taskTitle,
-    required String category,
+    required String taskDescription,
     required String employeeId,
     required String employeeName,
-    String? dueDate,
-    String? priority = 'Normal',
   }) async {
     try {
       isLoading.value = true;
 
-      String? currentEmail = FirebaseAuth.instance.currentUser?.email;
+      final nowIso = DateTime.now().toIso8601String();
 
-      // Create ticket document
-      await firebaseFirestore.collection('Tickets').add({
-        'Title': taskTitle,
-        'Category': category,
-        'Department': departmentName.value,
-        'AssignedBy': currentEmail,
-        'AssignedTo': employeeName,
-        'EmployeeId': employeeId,
-        'Status': 'Assigned',
-        'Priority': priority ?? 'Normal',
-        'DueDate': dueDate ?? DateTime.now().toString(),
-        'CreatedAt': DateTime.now(),
-        'Approval': 'Pending',
-        'Pictures': [],
-        'Feedback': [],
+      // Create ticket document using the correct schema from dummy_data
+      await firebaseFirestore.collection('tickets').add({
+        'ticket_title': taskTitle,
+        'ticket_description': taskDescription,
+        'created_at': nowIso,
+        'created_by': headUid.value,
+        'created_by_role': 'head',
+        'department_id': departmentName.value,
+        'assigned_to': {
+          'user_id': employeeId,
+          'name': employeeName,
+          'role': 'employee',
+        },
+        'assigned_by': {
+          'user_id': headUid.value,
+          'name': headName.value,
+          'role': 'head',
+          'assigned_at': nowIso,
+        },
+        'status': 'Assigned',
+        'completion': {
+          'completed_at': null,
+          'images': [],
+          'remarks': null,
+        },
+        'approved': null,
+        'approved_by': null,
+        'approved_at': null,
+        'feedback': null,
+        'feedback_rating': null,
+        'subtickets': [],
+        'last_updated_at': nowIso,
+        'last_updated_by': headUid.value,
       });
 
       // Send notification to employee
-      await firebaseFirestore.collection('Notifications').add({
+      await firebaseFirestore.collection('notifications').add({
         'recipient': employeeId,
-        'type': 'Task Assignment',
-        'message': 'New task assigned: $taskTitle',
-        'taskTitle': taskTitle,
-        'sender': currentEmail,
+        'type': 'Ticket Assignment',
+        'message': 'New ticket assigned: $taskTitle',
+        'ticket_title': taskTitle,
+        'sender': headUid.value,
         'timestamp': DateTime.now(),
         'read': false,
       });
 
       isLoading.value = false;
-      Get.snackbar('Success', 'Task assigned to $employeeName successfully!',
+      Get.snackbar('Success', 'Ticket assigned to $employeeName successfully!',
           backgroundColor: Color(0xFF27BB4A),
           colorText: Colors.white);
 
       // Refresh data
       await fetchTaskStatistics();
+      await fetchDepartmentEmployees();
     } catch (e) {
       isLoading.value = false;
-      Get.snackbar('Error', 'Failed to assign task: $e',
+      Get.snackbar('Error', 'Failed to assign ticket: $e',
           backgroundColor: Color(0xFFC12934),
           colorText: Colors.white);
     }
@@ -337,7 +381,7 @@ class HeadHomeController extends GetxController {
   /// Approve completed task
   Future<void> approveTask(String taskId) async {
     try {
-      await firebaseFirestore.collection('Tickets').doc(taskId).update({
+      await firebaseFirestore.collection('tickets').doc(taskId).update({
         'Approval': 'Approved',
         'ApprovedAt': DateTime.now(),
         'Status': 'Completed',
@@ -358,7 +402,7 @@ class HeadHomeController extends GetxController {
   /// Reject completed task
   Future<void> rejectTask(String taskId, String reason) async {
     try {
-      await firebaseFirestore.collection('Tickets').doc(taskId).update({
+      await firebaseFirestore.collection('tickets').doc(taskId).update({
         'Approval': 'Rejected',
         'RejectionReason': reason,
         'Status': 'In Progress',
@@ -383,7 +427,7 @@ class HeadHomeController extends GetxController {
     required double rating,
   }) async {
     try {
-      await firebaseFirestore.collection('Tickets').doc(taskId).update({
+      await firebaseFirestore.collection('tickets').doc(taskId).update({
         'Feedback': FieldValue.arrayUnion([
           {
             'from': FirebaseAuth.instance.currentUser?.email,
