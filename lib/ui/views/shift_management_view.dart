@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:squareone_admin/controllers/shift_controller.dart';
-import 'package:squareone_admin/controllers/user_controller.dart';
+
+import 'forms/shift_management/shift_controller.dart';
+import 'home/head/user_controller.dart';
 
 /// Controller for managing shift creation and editing
 class ShiftManagementController extends GetxController {

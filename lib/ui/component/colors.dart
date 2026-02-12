@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 import 'package:squareone_admin/ui/views/forms/add_depart_member/add_depart_member_view.dart';
 import 'package:squareone_admin/ui/views/home/food_dept/food_dept_view.dart';
+import 'package:squareone_admin/ui/views/home/head/admin_home/admin_home.dart';
+import 'package:squareone_admin/ui/views/home/head/admin_home/admin_notification/new_admin_notification.dart';
 import 'package:squareone_admin/ui/views/home/maintainance/maintainance_view.dart';
 import 'package:squareone_admin/ui/views/home/marketing/marketing_view.dart';
 import 'package:squareone_admin/ui/views/home/security/security_view.dart';
@@ -10,7 +12,8 @@ import 'package:squareone_admin/ui/views/profile/profile_view.dart';
 import 'package:squareone_admin/ui/views/team_availability_dashboard.dart';
 
 import '../views/home/admin/home_view.dart';
-import '../views/home/head/head_home.dart';
+import '../views/home/head/admin_home/adminprofile/new_admin_profile.dart';
+import '../views/home/head/head_home/head_home.dart';
 
 const Color redColor = Color(0xffC12934);
 const Color greenColor = Color(0xFFDEFFE5);
@@ -404,11 +407,16 @@ final adminPages = [
 
 final headPages = [
   const HeadHome(),
-  const NotificationsView(),
+  const TeamAvailabilityDashboard(),
   const TeamAvailabilityDashboard(),
   const ProfileView(),
 ];
-
+final newAdminPages = [
+  const AdminHome(),
+  const NewAdminNotification(),
+  // const AddDepartmentView(),
+  const NewAdminProfile(),
+];
 final foodDeptPages = [
   const FoodDeptView(),
   const NotificationsView(),

@@ -33,7 +33,8 @@ class MetricCard extends StatelessWidget {
       child: GestureDetector(
         onTap: onTap,
         child: Card(
-          elevation: 12,
+          elevation: 5,
+          shadowColor: Colors.black.withOpacity(0.65),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
           ),

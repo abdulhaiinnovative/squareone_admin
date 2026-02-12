@@ -33,7 +33,8 @@ class MyProfileCards extends StatelessWidget {
           surfaceTintColor: Colors.transparent,
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          elevation: 10,
+          elevation: 5,
+          shadowColor: Colors.black.withOpacity(0.65),
           child: Padding(
             padding: const EdgeInsets.all(14.0),
             child: Row(

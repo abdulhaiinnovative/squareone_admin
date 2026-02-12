@@ -1,4 +1,4 @@
-package com.innovativewidget.squareone_admin
+package com.example.squareone_admin
 
 import io.flutter.embedding.android.FlutterActivity
 

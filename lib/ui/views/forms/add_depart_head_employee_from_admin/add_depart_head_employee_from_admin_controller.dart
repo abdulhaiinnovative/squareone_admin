@@ -6,7 +6,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class AddDeptEmployeeController extends GetxController {
+class AddDepartHeadEmployeeFromAdminController extends GetxController {
   final isLoading = false.obs;
 
   final nameController = TextEditingController();
@@ -16,6 +16,9 @@ class AddDeptEmployeeController extends GetxController {
   final shiftDateController = TextEditingController();
   final shiftStartController = TextEditingController();
   final shiftEndController = TextEditingController();
+  final departmentsList = <String>[].obs;
+  final selectedDepartment = ''.obs;
+
 
   final selectedRole = 'employee'.obs;
   final departmentName = ''.obs;
@@ -43,6 +46,38 @@ class AddDeptEmployeeController extends GetxController {
     shiftEndController.dispose();
     super.onClose();
   }
+
+  @override
+  void onInit() {
+    super.onInit();
+    fetchDepartments();
+  }
+
+
+  Future<void> fetchDepartments() async {
+    try {
+      final snapshot =
+      await _firestore.collection('departments').get();
+
+      departmentsList.clear();
+
+      for (var doc in snapshot.docs) {
+
+          departmentsList.add(doc['name']);
+
+      }
+
+      // Default select first department (optional)
+      if (departmentsList.isNotEmpty) {
+        selectedDepartment.value = departmentsList.first;
+      }
+
+    } catch (e) {
+      log('Error fetching departments: $e');
+      Get.snackbar('Error', 'Failed to load departments');
+    }
+  }
+
 
   // Date & Time Pickers (same as before)
   Future<void> pickShiftDate(BuildContext context) async {
@@ -84,8 +119,8 @@ class AddDeptEmployeeController extends GetxController {
     }
   }
 
-
   Future<void> addEmployee() async {
+    // Basic validation
     if (nameController.text.trim().isEmpty ||
         emailController.text.trim().isEmpty ||
         phoneController.text.trim().isEmpty ||
@@ -97,11 +132,13 @@ class AddDeptEmployeeController extends GetxController {
       return;
     }
 
+    // Email format check (basic)
     if (!GetUtils.isEmail(emailController.text.trim())) {
       Get.snackbar('Error', 'Please enter a valid email');
       return;
     }
 
+    // Password length check (minimum 6 chars for Firebase Auth)
     if (passwordController.text.trim().length < 6) {
       Get.snackbar('Error', 'Password must be at least 6 characters');
       return;
@@ -114,30 +151,11 @@ class AddDeptEmployeeController extends GetxController {
       final password = passwordController.text.trim();
       final currentUser = FirebaseAuth.instance.currentUser;
 
-      final currentUserUid = currentUser?.uid;
+      final currentUserUid  = currentUser?.uid;          // ← best to use UID
       final currentUserEmail = currentUser?.email ?? 'unknown';
 
-      // 🔹 Get current user's department from Firestore
-      String currentUserDepartment = '';
-
-      if (currentUserUid != null) {
-        final currentUserDoc = await _firestore
-            .collection('personnel')
-            .doc(currentUserUid)
-            .get();
-
-        if (currentUserDoc.exists) {
-          final data =
-              currentUserDoc.data() as Map<String, dynamic>? ?? {};
-
-          currentUserDepartment =
-              data['department'] ??
-                  data['department_id'] ??
-                  '';
-        }
-      }
-
-      // Step 1: Create user in secondary Firebase app
+      // Step 1: Create user in Firebase Authentication using a secondary FirebaseApp
+      // This prevents the default app's currentUser from being replaced.
       FirebaseApp secondaryApp;
       try {
         secondaryApp = Firebase.app('Secondary');
@@ -148,11 +166,8 @@ class AddDeptEmployeeController extends GetxController {
         );
       }
 
-      final secondaryAuth =
-      FirebaseAuth.instanceFor(app: secondaryApp);
-
-      UserCredential userCredential =
-      await secondaryAuth.createUserWithEmailAndPassword(
+      final secondaryAuth = FirebaseAuth.instanceFor(app: secondaryApp);
+      UserCredential userCredential = await secondaryAuth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
@@ -169,7 +184,7 @@ class AddDeptEmployeeController extends GetxController {
         }
       ];
 
-      // Step 3: Save user data in Firestore
+      // Step 3: Save user data in Firestore (WITHOUT password)
       await _firestore.collection('personnel').doc(uid).set({
         'uid': uid,
         'name': nameController.text.trim(),
@@ -177,20 +192,20 @@ class AddDeptEmployeeController extends GetxController {
         'phone': phoneController.text.trim(),
         'role': selectedRole.value,
         'status': 'Offline',
-
-        // ✅ Current logged-in user's department
-        'department': currentUserDepartment,
-
+        'department': selectedDepartment.value,
         'added_by': currentUserUid,
         'password': passwordController.text.trim(),
         'shifts': shiftsArray,
         'createdAt': FieldValue.serverTimestamp(),
       });
 
+      // Clean up secondary app/auth so it doesn't hold resources or affect state
       try {
         await secondaryAuth.signOut();
         await secondaryApp.delete();
-      } catch (e) {}
+      } catch (e) {
+        // ignore cleanup errors
+      }
 
       Get.snackbar(
         'Success',
@@ -215,8 +230,7 @@ class AddDeptEmployeeController extends GetxController {
         errorMessage = e.message ?? 'Authentication failed';
       }
 
-      Get.snackbar('Error', errorMessage,
-          backgroundColor: Colors.redAccent);
+      Get.snackbar('Error', errorMessage, backgroundColor: Colors.redAccent);
       log('Firebase Auth Error: ${e.code} - ${e.message}');
     } catch (e) {
       log('Error adding employee: $e');
@@ -225,7 +239,6 @@ class AddDeptEmployeeController extends GetxController {
       isLoading.value = false;
     }
   }
-
 
   void _clearFields() {
     nameController.clear();

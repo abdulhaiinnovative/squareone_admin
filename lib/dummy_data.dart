@@ -16,9 +16,9 @@ const Map<String, Map<String, dynamic>> personnel = {
     'password': 'superadmin123',
   },
   'user_id2': {
-    'name': 'Admin User',
-    'role': 'Admin',
-    'email': 'admin@example.com',
+    'name': 'Squareone Admin',
+    'role': 'admin',
+    'email': 'admin@gmail.com',
     'password': 'admin123',
     'phone': '+0987654321',
   },

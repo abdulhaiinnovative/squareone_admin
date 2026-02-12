@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:salomon_bottom_bar/salomon_bottom_bar.dart';
 
-import '../../../component/colors.dart';
+import '../../../../component/colors.dart';
 
 class HeadHomeView extends StatelessWidget {
   HeadHomeView({super.key});

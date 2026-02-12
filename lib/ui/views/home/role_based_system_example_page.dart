@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:squareone_admin/controllers/user_controller.dart';
+
 import 'package:squareone_admin/ui/views/forms/shift_management/shift_controller.dart';
-import 'package:squareone_admin/controllers/department_controller.dart';
+
 import 'package:squareone_admin/ui/widgets/employee_availability_widgets.dart';
+
+import 'head/user_controller.dart';
 
 /// Example page showing how to use all role-based system features
 class RoleBasedSystemExamplePage extends StatefulWidget {
@@ -18,8 +20,6 @@ class _RoleBasedSystemExamplePageState
     extends State<RoleBasedSystemExamplePage> {
   final UserController userController = Get.find<UserController>();
   final ShiftController shiftController = Get.find<ShiftController>();
-  final DepartmentController departmentController =
-      Get.find<DepartmentController>();
 
   int selectedTabIndex = 0;
 
@@ -394,8 +394,7 @@ class _RoleBasedSystemExamplePageState
                   const SizedBox(height: 12),
                   StatRow(
                     label: 'Total',
-                    value: departmentController.allDepartments.length
-                        .toString(),
+                    value: 'abcd',
                   ),
                 ],
               ),

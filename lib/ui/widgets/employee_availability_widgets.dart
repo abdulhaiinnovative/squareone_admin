@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:squareone_admin/controllers/user_controller.dart';
 import 'package:squareone_admin/ui/views/forms/shift_management/shift_controller.dart';
-import 'package:squareone_admin/helpers/availability_helper.dart';
+
+import '../../helper/availability_helper.dart';
+import '../views/home/head/user_controller.dart';
 
 /// Example widget showing how to display employees with availability status
 class EmployeeListWithAvailability extends StatelessWidget {

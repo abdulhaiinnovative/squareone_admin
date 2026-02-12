@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:squareone_admin/ui/component/buttons.dart';
 
-import '../views/home/head/head_home_controller.dart';
+import '../views/home/head/head_home/head_home_controller.dart';
+
+
 
 class AssignNewTaskCard extends StatelessWidget {
   final HeadHomeController controller;
@@ -30,9 +32,10 @@ class AssignNewTaskCard extends StatelessWidget {
           child: Card(
             surfaceTintColor: Colors.transparent,
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(15),
+              borderRadius: BorderRadius.circular(12),
             ),
-            elevation: 12,
+            elevation: 5,
+            shadowColor: Colors.black.withOpacity(0.65),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -45,7 +48,7 @@ class AssignNewTaskCard extends StatelessWidget {
                       Text(
                         this.title,
                         style: const TextStyle(
-                          fontSize: 19,
+                          fontSize: 15,
                           color: Colors.black,
                           fontWeight: FontWeight.w500,
                         ),
