@@ -9,6 +9,7 @@ import 'package:squareone_admin/ui/env.dart';
 import 'package:squareone_admin/ui/views/splash/splash_view.dart';
 import 'package:squareone_admin/ui/views/home/head/user_controller.dart';
 import 'package:squareone_admin/ui/views/forms/shift_management/shift_controller.dart';
+import 'package:squareone_admin/ui/views/home/head/head_home/head_home_controller.dart';
 import 'firebase_options.dart';
 
 Future<void> backgroundHandler(RemoteMessage message) async {}
@@ -26,6 +27,7 @@ void main() async {
   // Initialize GetX Controllers
   Get.put<UserController>(UserController(), permanent: true);
   Get.put<ShiftController>(ShiftController(), permanent: true);
+  Get.put<HeadHomeController>(HeadHomeController(), permanent: true);
   
   runApp(const MyApp());
 }

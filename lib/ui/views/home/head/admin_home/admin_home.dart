@@ -8,8 +8,9 @@ import 'package:squareone_admin/ui/views/forms/add_depart_member/add_depart_memb
 import 'package:squareone_admin/ui/views/forms/add_outlet/add_outlet_view.dart';
 import 'package:squareone_admin/ui/views/home/head/admin_home/cards/cards_controller.dart';
 import 'package:squareone_admin/ui/views/home/head/admin_home/cards/department_list_view.dart';
-import 'package:squareone_admin/ui/views/home/head/admin_home/cards/employee_list_view.dart';
+
 import 'package:squareone_admin/ui/views/home/head/admin_home/cards/heads_list_view.dart';
+import 'package:squareone_admin/ui/views/home/head/head_home/worker_view.dart';
 import 'package:squareone_admin/ui/views/home/head/onshift/onshift_employee_detail.dart';
 import 'package:squareone_admin/ui/views/home/home_controller.dart';
 
@@ -49,7 +50,7 @@ class _AdminHomeState extends State<AdminHome> {
     log(context.height.toString());
 
     return GetBuilder<HeadHomeController>(
-      init: Get.put<HeadHomeController>(HeadHomeController()),
+      init: Get.find<HeadHomeController>(),
       builder: (controller) {
         return Scaffold(
           body: RefreshIndicator(
@@ -58,6 +59,7 @@ class _AdminHomeState extends State<AdminHome> {
               await cardController.fetchHeads();
               await cardController.fetchDepartments();
               await controller.fetchDepartmentEmployees();
+              await controller.fetchDepartments();
               await controller.fetchDepartmentStaff();
               await controller.fetchTaskStatistics();
             },
@@ -162,7 +164,7 @@ class _AdminHomeState extends State<AdminHome> {
                                           arguments: {'title': 'Departments'});
                                     },
                                     title: 'Departments',
-                                    count: controller.activeTasksCount,
+                                    count: controller.departmentsCount,
                                     icon: Icons.assignment,
                                     color: Color(0xFF27BB4A),
                                     width: width,
@@ -187,11 +189,10 @@ class _AdminHomeState extends State<AdminHome> {
                                   // Completed Tasks Card
                                   MetricCard(
                                     onTap: () {
-                                      Get.to(() => EmployeeListView(),
-                                          arguments: {'title': 'Employees'});
+                                      Get.to(() => WorkerView());
                                     },
                                     title: 'Employees',
-                                    count: controller.completedTasksCount,
+                                    count: controller.totalEmployeesCount,
                                     icon: Icons.done_all,
                                     color: Color(0xFF4CAF50),
                                     width: width,
@@ -257,103 +258,103 @@ class _AdminHomeState extends State<AdminHome> {
                           ],
                         ),
                         // ========== ACTIVE TASKS SECTION ==========
-                        Padding(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 18, vertical: 12),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              /// Title
-                              SectionTitle('Active Tickets'),
-
-                              const SizedBox(height: 5),
-
-                              /// Content - Show 1 task (or all if expanded)
-                              // Obx(
-                              //   () {
-                              //     final displayCount =
-                              //         controller.expandTasks.value
-                              //             ? controller.activeTasks.length
-                              //             : (controller.activeTasks.length > 1
-                              //                 ? 1
-                              //                 : controller.activeTasks.length);
-                              //
-                              //     return controller.activeTasks.isEmpty
-                              //         ? Container(
-                              //             padding: const EdgeInsets.symmetric(
-                              //                 vertical: 24),
-                              //             alignment: Alignment.center,
-                              //             child: const Text(
-                              //               'No active tasks',
-                              //               style: TextStyle(
-                              //                 color: Colors.grey,
-                              //                 fontSize: 14,
-                              //               ),
-                              //             ),
-                              //           )
-                              //         : ListView.separated(
-                              //             shrinkWrap: true,
-                              //             physics:
-                              //                 const NeverScrollableScrollPhysics(),
-                              //             itemCount: displayCount,
-                              //             separatorBuilder: (_, __) =>
-                              //                 const SizedBox(height: 8),
-                              //             itemBuilder: (context, index) {
-                              //               var task =
-                              //                   controller.activeTasks[index];
-                              //               final ticket =
-                              //                   controller.assignedTasks[index];
-                              //               return GestureDetector(
-                              //                   onTap: () {
-                              //                     Get.to(() => HeadTicketDetail(
-                              //                         ticket: ticket));
-                              //                   },
-                              //                   child:
-                              //                       _buildActiveTaskCard(task));
-                              //             },
-                              //           );
-                              //   },
-                              // ),
-                              const SizedBox(height: 5),
-
-                              /// Expand/Collapse Button
-                              // Obx(() {
-                              //   if (controller.activeTasks.length > 1) {
-                              //     return Center(
-                              //       child: ElevatedButton.icon(
-                              //         onPressed: () {
-                              //           controller.expandTasks.value =
-                              //               !controller.expandTasks.value;
-                              //         },
-                              //         icon: Icon(
-                              //           controller.expandTasks.value
-                              //               ? Icons.expand_less
-                              //               : Icons.expand_more,
-                              //           size: 18,
-                              //         ),
-                              //         label: Text(
-                              //           controller.expandTasks.value
-                              //               ? 'Show Less'
-                              //               : 'More (${controller.activeTasks.length})',
-                              //         ),
-                              //         style: ElevatedButton.styleFrom(
-                              //           elevation: 5,
-                              //           shape: RoundedRectangleBorder(
-                              //               borderRadius:
-                              //                   BorderRadius.circular(12)),
-                              //           shadowColor:
-                              //               Colors.black.withOpacity(0.65),
-                              //           backgroundColor: redColor,
-                              //           foregroundColor: Colors.white,
-                              //         ),
-                              //       ),
-                              //     );
-                              //   }
-                              //   return const SizedBox.shrink();
-                              // }),
-                            ],
-                          ),
-                        ),
+                        // Padding(
+                        //   padding: const EdgeInsets.symmetric(
+                        //       horizontal: 18, vertical: 12),
+                        //   child: Column(
+                        //     crossAxisAlignment: CrossAxisAlignment.start,
+                        //     children: [
+                        //       /// Title
+                        //       SectionTitle('Active Tickets'),
+                        //
+                        //       const SizedBox(height: 5),
+                        //
+                        //       /// Content - Show 1 task (or all if expanded)
+                        //       Obx(
+                        //         () {
+                        //           final displayCount =
+                        //               controller.expandTasks.value
+                        //                   ? controller.activeTasks.length
+                        //                   : (controller.activeTasks.length > 1
+                        //                       ? 1
+                        //                       : controller.activeTasks.length);
+                        //
+                        //           return controller.activeTasks.isEmpty
+                        //               ? Container(
+                        //                   padding: const EdgeInsets.symmetric(
+                        //                       vertical: 24),
+                        //                   alignment: Alignment.center,
+                        //                   child: const Text(
+                        //                     'No active tasks',
+                        //                     style: TextStyle(
+                        //                       color: Colors.grey,
+                        //                       fontSize: 14,
+                        //                     ),
+                        //                   ),
+                        //                 )
+                        //               : ListView.separated(
+                        //                   shrinkWrap: true,
+                        //                   physics:
+                        //                       const NeverScrollableScrollPhysics(),
+                        //                   itemCount: displayCount,
+                        //                   separatorBuilder: (_, __) =>
+                        //                       const SizedBox(height: 8),
+                        //                   itemBuilder: (context, index) {
+                        //                     var task =
+                        //                         controller.activeTasks[index];
+                        //                     final ticket =
+                        //                         controller.assignedTasks[index];
+                        //                     return GestureDetector(
+                        //                         onTap: () {
+                        //                           Get.to(() => HeadTicketDetail(
+                        //                               ticket: ticket));
+                        //                         },
+                        //                         child:
+                        //                             _buildActiveTaskCard(task));
+                        //                   },
+                        //                 );
+                        //         },
+                        //       ),
+                        //       const SizedBox(height: 5),
+                        //
+                        //
+                        //       Obx(() {
+                        //         if (controller.activeTasks.length > 1) {
+                        //           return Center(
+                        //             child: ElevatedButton.icon(
+                        //               onPressed: () {
+                        //                 controller.expandTasks.value =
+                        //                     !controller.expandTasks.value;
+                        //               },
+                        //               icon: Icon(
+                        //                 controller.expandTasks.value
+                        //                     ? Icons.expand_less
+                        //                     : Icons.expand_more,
+                        //                 size: 18,
+                        //               ),
+                        //               label: Text(
+                        //                 controller.expandTasks.value
+                        //                     ? 'Show Less'
+                        //                     : 'More (${controller.activeTasks.length})',
+                        //               ),
+                        //               style: ElevatedButton.styleFrom(
+                        //                 elevation: 5,
+                        //                 shape: RoundedRectangleBorder(
+                        //                     borderRadius:
+                        //                         BorderRadius.circular(12)),
+                        //                 shadowColor:
+                        //                     Colors.black.withOpacity(0.65),
+                        //                 backgroundColor: redColor,
+                        //                 foregroundColor: Colors.white,
+                        //               ),
+                        //             ),
+                        //           );
+                        //         }
+                        //         return const SizedBox.shrink();
+                        //       }),
+                        //     ],
+                        //   ),
+                        // ),
 
                         // ========== EMPLOYEE AVAILABILITY SECTION ==========
                         Padding(
@@ -368,88 +369,88 @@ class _AdminHomeState extends State<AdminHome> {
                               const SizedBox(height: 5),
 
                               /// Content - Show 3 employees (or all if expanded)
-                              // Obx(
-                              //   () {
-                              //     final displayCount = controller
-                              //             .expandEmployees.value
-                              //         ? controller.onShiftEmployees.length
-                              //         : (controller.onShiftEmployees.length > 1
-                              //             ? 1
-                              //             : controller.onShiftEmployees.length);
-                              //
-                              //     return controller.onShiftEmployees.isEmpty
-                              //         ? Container(
-                              //             padding: const EdgeInsets.symmetric(
-                              //                 vertical: 24),
-                              //             alignment: Alignment.center,
-                              //             child: const Text(
-                              //               'No employees on shift currently',
-                              //               style: TextStyle(
-                              //                 color: Colors.grey,
-                              //                 fontSize: 14,
-                              //               ),
-                              //             ),
-                              //           )
-                              //         : ListView.separated(
-                              //             shrinkWrap: true,
-                              //             physics:
-                              //                 const NeverScrollableScrollPhysics(),
-                              //             itemCount: displayCount,
-                              //             separatorBuilder: (_, __) =>
-                              //                 const SizedBox(height: 8),
-                              //             itemBuilder: (context, index) {
-                              //               var employee = controller
-                              //                   .onShiftEmployees[index];
-                              //               return GestureDetector(
-                              //                   onTap: () {
-                              //                     Get.to(() =>
-                              //                         OnshiftEmployeeDetail(
-                              //                           employee: employee,
-                              //                         ));
-                              //                   },
-                              //                   child: _buildEmployeeCard(
-                              //                       employee));
-                              //             },
-                              //           );
-                              //   },
-                              // ),
+                              Obx(
+                                () {
+                                  final displayCount = controller
+                                          .expandEmployees.value
+                                      ? controller.onShiftEmployees.length
+                                      : (controller.onShiftEmployees.length > 1
+                                          ? 1
+                                          : controller.onShiftEmployees.length);
+
+                                  return controller.onShiftEmployees.isEmpty
+                                      ? Container(
+                                          padding: const EdgeInsets.symmetric(
+                                              vertical: 24),
+                                          alignment: Alignment.center,
+                                          child: const Text(
+                                            'No employees on shift currently',
+                                            style: TextStyle(
+                                              color: Colors.grey,
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                        )
+                                      : ListView.separated(
+                                          shrinkWrap: true,
+                                          physics:
+                                              const NeverScrollableScrollPhysics(),
+                                          itemCount: displayCount,
+                                          separatorBuilder: (_, __) =>
+                                              const SizedBox(height: 8),
+                                          itemBuilder: (context, index) {
+                                            var employee = controller
+                                                .onShiftEmployees[index];
+                                            return GestureDetector(
+                                                onTap: () {
+                                                  Get.to(() =>
+                                                      OnshiftEmployeeDetail(
+                                                        employee: employee,
+                                                      ));
+                                                },
+                                                child: _buildEmployeeCard(
+                                                    employee));
+                                          },
+                                        );
+                                },
+                              ),
                               const SizedBox(height: 5),
 
                               /// Expand/Collapse Button
-                              // Obx(() {
-                              //   if (controller.onShiftEmployees.length > 1) {
-                              //     return Center(
-                              //       child: ElevatedButton.icon(
-                              //         onPressed: () {
-                              //           controller.expandEmployees.value =
-                              //               !controller.expandEmployees.value;
-                              //         },
-                              //         icon: Icon(
-                              //           controller.expandEmployees.value
-                              //               ? Icons.expand_less
-                              //               : Icons.expand_more,
-                              //           size: 18,
-                              //         ),
-                              //         label: Text(
-                              //           controller.expandEmployees.value
-                              //               ? 'Show Less'
-                              //               : 'View All (${controller.onShiftEmployees.length})',
-                              //         ),
-                              //         style: ElevatedButton.styleFrom(
-                              //           elevation: 5,
-                              //           shape: RoundedRectangleBorder(
-                              //               borderRadius:
-                              //                   BorderRadius.circular(12)),
-                              //           shadowColor:
-                              //               Colors.black.withOpacity(0.65),
-                              //           backgroundColor: redColor,
-                              //           foregroundColor: Colors.white,
-                              //         ),
-                              //       ),
-                              //     );
-                              //   }
-                              //   return const SizedBox.shrink();
-                              // }),
+                              Obx(() {
+                                if (controller.onShiftEmployees.length > 1) {
+                                  return Center(
+                                    child: ElevatedButton.icon(
+                                      onPressed: () {
+                                        controller.expandEmployees.value =
+                                            !controller.expandEmployees.value;
+                                      },
+                                      icon: Icon(
+                                        controller.expandEmployees.value
+                                            ? Icons.expand_less
+                                            : Icons.expand_more,
+                                        size: 18,
+                                      ),
+                                      label: Text(
+                                        controller.expandEmployees.value
+                                            ? 'Show Less'
+                                            : 'View All (${controller.onShiftEmployees.length})',
+                                      ),
+                                      style: ElevatedButton.styleFrom(
+                                        elevation: 5,
+                                        shape: RoundedRectangleBorder(
+                                            borderRadius:
+                                                BorderRadius.circular(12)),
+                                        shadowColor:
+                                            Colors.black.withOpacity(0.65),
+                                        backgroundColor: redColor,
+                                        foregroundColor: Colors.white,
+                                      ),
+                                    ),
+                                  );
+                                }
+                                return const SizedBox.shrink();
+                              }),
                             ],
                           ),
                         ),

@@ -10,10 +10,18 @@ class HeadHomeController extends GetxController {
   GetStorage storage = GetStorage();
   FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
 
+  RxInt totalEmployeesCount = 0.obs;
+
+  // Departments
+  RxList<String> departmentsList = <String>[].obs;
+  RxInt departmentsCount = 0.obs;
+
+
   // User Info
   RxString headUid = ''.obs;
   RxString headName = ''.obs;
-  RxString adminName = ''.obs; // ← Added adminName
+  RxString adminName = ''.obs;
+  RxString adminRole = ''.obs;
   RxString departmentName = ''.obs;
 
   // Task Statistics
@@ -39,6 +47,7 @@ class HeadHomeController extends GetxController {
   RxBool expandTasks = false.obs;
 
   RxString currentUserRole = ''.obs;
+  RxString currentUserName = ''.obs;
 
 
   @override
@@ -163,13 +172,14 @@ class HeadHomeController extends GetxController {
 
         headUid.value = uid;
 
-        // ✅ SAFE ACCESS
+
         headName.value =
         data['name']?.toString().trim().isNotEmpty == true
             ? data['name'].toString().trim()
             : currentUser.displayName ??
             currentUser.email?.split('@')[0] ??
             'Head';
+
 
         adminName.value = headName.value;
 
@@ -179,8 +189,13 @@ class HeadHomeController extends GetxController {
             : 'Unknown Department';
 
         currentUserRole.value =
-            data['role']?.toString().toLowerCase().trim() ?? 'unknown';
+            data['role'];
 
+        currentUserName.value =
+            data['name']?.toString().trim() ?? 'unknown';
+
+        adminName.value = headName.value; // if head/admin themselves
+        adminRole.value = currentUserRole.value; // track role separately
         print("Head Name: ${headName.value}");
         print("Department: ${departmentName.value}");
       } else {
@@ -227,10 +242,13 @@ class HeadHomeController extends GetxController {
           'email': data['email'] ?? '',
           'role': data['role'] ?? 'employee',
           'status': data['status'] ?? 'Offline',
+          'department': data['department'] ?? '',
           'availability': checkEmployeeOnlineStatus(data['shifts']),
           'shifts': data['shifts'] ?? [],
         };
+
       }).toList();
+
 
       onShiftEmployees.value = departmentEmployees
           .where((emp) => emp['availability'] == true)
@@ -267,6 +285,10 @@ class HeadHomeController extends GetxController {
 
       departmentEmployees.value = snapshot.docs.map((doc) {
         final data = doc.data() as Map<String, dynamic>;
+        totalEmployeesCount.value = departmentEmployees
+            .where((e) => (e['role'] ?? '').toString().toLowerCase() == 'employee')
+            .length;
+
 
         return {
           'id': doc.id,
@@ -290,6 +312,20 @@ class HeadHomeController extends GetxController {
       print("Error fetching staff: $e");
     } finally {
       isLoading.value = false;
+    }
+  }
+  Future<void> fetchDepartments() async {
+    try {
+      QuerySnapshot snapshot =
+      await firebaseFirestore.collection('departments').get();
+
+      departmentsList.value =
+          snapshot.docs.map((doc) => doc['name'].toString()).toList();
+
+      departmentsCount.value = departmentsList.length;
+
+    } catch (e) {
+      print("Error fetching departments: $e");
     }
   }
 
@@ -461,9 +497,16 @@ class HeadHomeController extends GetxController {
         return {
           'id': doc.id,
           'title': data['ticket_title'] ?? 'No Title',
-          'status': data['status'] ?? 'Unknown',
-          'assignee': data['assigned_to']?['name'] ?? 'Unassigned',
-          'completedAt': data['completion']?['completed_at'] ?? 'N/A',
+          'description': data['ticket_description'] ?? '',
+          'department': data['department'] ?? '',
+          'status': data['status'] ?? 'Open',
+          'priority': data['priority'] ?? 'Normal',
+          'dueDate': data['due_date'] ?? 'No date',
+          'assignedTo': data['assigned_to']?['name'] ?? 'Unassigned',
+          'assignedToRole': data['assigned_to']?['role'] ?? 'N/A',
+          'assignedBy': data['assigned_by']?['name'] ?? 'N/A',
+          'assignedByRole': data['assigned_by']?['role'] ?? 'N/A',
+          'assignedAt': data['assigned_by']?['assigned_at'] ?? 'N/A',
         };
       }).toList();
 

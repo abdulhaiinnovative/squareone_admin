@@ -58,7 +58,8 @@ class HeadTicketTile extends StatelessWidget {
       onTap: onTap,
       child: Card(
         margin: const EdgeInsets.only(bottom: 12),
-        elevation: 6,
+        elevation: 5,
+        shadowColor: Colors.black.withOpacity(0.65),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         child: Padding(
           padding: const EdgeInsets.all(16),

@@ -5,15 +5,19 @@ import 'package:squareone_admin/ui/views/auth/auth_controller.dart';
 import 'package:squareone_admin/ui/views/department/department_view.dart';
 import 'package:squareone_admin/ui/views/home/head/head_home/head_home_controller.dart';
 import 'package:squareone_admin/ui/views/home/head/head_home/head_profile_details.dart';
+import 'package:squareone_admin/ui/views/outlets/outlet_view.dart';
+import 'package:squareone_admin/ui/views/profile/my_profile_view.dart';
+import 'package:squareone_admin/ui/views/profile/profile_controller.dart';
+import 'package:squareone_admin/ui/views/tickets/dismissed_tickets.dart';
+import 'package:squareone_admin/ui/views/tickets/tickets_list.dart';
+import '../../../../component/profile_card.dart';
+import '../../../team_availability_dashboard.dart';
+import '../../../tickets/head_ticket/head_view_tickets.dart';
+import '../admin_home/cards/department_list_view.dart';
+import '../admin_home/cards/heads_list_view.dart';
 
-import '../../../../../component/profile_card.dart';
-import '../../../../tickets/head_ticket/head_view_tickets.dart';
-import '../cards/department_list_view.dart';
-import '../cards/employee_list_view.dart';
-import '../cards/heads_list_view.dart';
-
-class NewAdminProfile extends StatelessWidget {
-  const NewAdminProfile({super.key});
+class HeadProfileView extends StatelessWidget {
+  const HeadProfileView({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -60,9 +64,9 @@ class NewAdminProfile extends StatelessWidget {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
 
-                                  Text(controller.adminName.value,style: TextStyle(color: Colors.white),),
+                                  Text(controller.currentUserName.value,style: TextStyle(color: Colors.white),),
                                   Text(
-                                    controller.adminRole.value,
+                                    controller.currentUserRole.value,
                                     style: const TextStyle(
                                       color: Colors.white70,
                                       fontSize: 14,
@@ -105,44 +109,42 @@ class NewAdminProfile extends StatelessWidget {
                     ),
                     Padding(
                       padding:
-                      const EdgeInsets.only(top: 10, right: 12, left: 12),
+                          const EdgeInsets.only(top: 10, right: 12, left: 12),
                       child: MyProfileCards(
                         height: height,
                         width: width,
-                        text: 'Heads',
+                        text: 'Active Tickets',
                         imgUrl: 'assets/profile/profile.svg',
                         function: () {
-                          Get.to(() => HeadsListView(), arguments: {
-                            'title': 'Department Heads'
-                          });
+                          Get.to(() => HeadViewTickets(),
+                              arguments: {'title': 'Active Tickets'});
                         },
                       ),
                     ),
                     Padding(
                       padding:
-                      const EdgeInsets.only(top: 10, right: 12, left: 12),
+                          const EdgeInsets.only(top: 10, right: 12, left: 12),
                       child: MyProfileCards(
                         height: height,
                         width: width,
-                        text: 'Departments',
+                        text: 'Pending Approvals',
                         imgUrl: 'assets/profile/profile.svg',
                         function: () {
-                          Get.to(() => DepartmentListView(),
-                              arguments: {'title': 'Departments'});
+                          Get.to(() => HeadViewTickets(),
+                              arguments: {'title': 'Pending Approval'});
                         },
                       ),
                     ),
                     Padding(
                       padding:
-                      const EdgeInsets.only(top: 10, right: 12, left: 12),
+                          const EdgeInsets.only(top: 10, right: 12, left: 12),
                       child: MyProfileCards(
                         height: height,
                         width: width,
-                        text: 'Employees',
+                        text: 'OnShift Employees',
                         imgUrl: 'assets/profile/profile.svg',
                         function: () {
-                          Get.to(() => EmployeeListView(),
-                              arguments: {'title': 'Employees'});
+                          Get.to(() => TeamAvailabilityDashboard());
                         },
                       ),
                     ),
@@ -158,7 +160,7 @@ class NewAdminProfile extends StatelessWidget {
                     ),
                     Padding(
                       padding:
-                      const EdgeInsets.only(top: 10, right: 12, left: 12),
+                          const EdgeInsets.only(top: 10, right: 12, left: 12),
                       child: MyProfileCards(
                         height: height,
                         width: width,
@@ -171,7 +173,7 @@ class NewAdminProfile extends StatelessWidget {
                     ),
                     Padding(
                       padding:
-                      const EdgeInsets.only(top: 10, right: 12, left: 12),
+                          const EdgeInsets.only(top: 10, right: 12, left: 12),
                       child: MyProfileCards(
                         height: height,
                         width: width,

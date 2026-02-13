@@ -39,22 +39,27 @@ class OnshiftEmployeeDetail extends StatelessWidget {
       body: FutureBuilder<DocumentSnapshot>(
         future: employeeId.isNotEmpty
             ? FirebaseFirestore.instance.collection('personnel').doc(employeeId).get()
-            : Future.value(null),
+            : null,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator(color: redColor));
           }
 
-          if (!snapshot.hasData || snapshot.data == null || !snapshot.data!.exists) {
+          if (snapshot.hasError) {
+            return Center(child: Text('Error loading employee data'));
+          }
+
+          final doc = snapshot.data;
+          if (doc == null || !doc.exists) {
             return Center(
               child: Text(
                 'Employee data not found',
-                style: TextStyle(fontSize: 16, color: Colors.grey),
+                style: const TextStyle(color: Colors.grey),
               ),
             );
           }
 
-          final employeeData = snapshot.data!.data() as Map<String, dynamic>;
+          final employeeData = doc.data() as Map<String, dynamic>;
 
           final String empName = employeeData['name'] ?? employee['name'] ?? 'Unknown';
           final String empEmail = employeeData['email'] ?? 'N/A';

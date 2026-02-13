@@ -24,7 +24,7 @@ class NewAdminHomeView extends StatelessWidget {
           init: Get.put<AdminHomeController>(AdminHomeController()),
           builder: (controller) => SalomonBottomBar(
             selectedItemColor: const Color.fromARGB(255, 23, 35, 44),
-            items: headItems,
+            items: newAdminItems,
             currentIndex: controller.index.value,
             onTap: (i) => controller.indexChange(i),
           ),

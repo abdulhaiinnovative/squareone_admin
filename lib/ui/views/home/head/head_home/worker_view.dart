@@ -5,12 +5,11 @@ import 'package:squareone_admin/ui/component/colors.dart';
 import 'package:squareone_admin/ui/views/home/head/head_home/head_home_controller.dart';
 import 'package:squareone_admin/ui/views/home/head/onshift/onshift_employee_detail.dart';
 import 'package:squareone_admin/ui/views/tickets/head_ticket/head_ticket_tile.dart';
+import '../../../forms/add_depart_employee/add_depart_employee_view.dart';
+import 'assign_ticket_view.dart';
 
-import '../../../../forms/add_depart_employee/add_depart_employee_view.dart';
-import '../../head_home/assign_ticket_view.dart';
-
-class EmployeeListView extends StatelessWidget {
-  EmployeeListView({super.key});
+class WorkerView extends StatelessWidget {
+  WorkerView({super.key});
 
   final HeadHomeController headController = Get.find<HeadHomeController>();
 
@@ -123,8 +122,19 @@ class EmployeeListView extends StatelessWidget {
             right: 16,
             child: GestureDetector(
               onTap: () {
-                  Get.to(() => AssignTicketView(controller: headController));
+                // Check the current user's role
+                final role = headController.currentUserRole.value.toLowerCase();
 
+                if (role == 'admin') {
+                  // Navigate to AssignTicketView for admin
+                  Get.to(() => AssignTicketView(controller: headController));
+                } else if (role == 'head') {
+                  // Navigate to AddDepartEmployeeView for head
+                  Get.to(() => const AddDepartEmployeeView());
+                } else {
+                  // Optional: show a message if role is something else
+                  Get.snackbar('Access Denied', 'You do not have permission for this action');
+                }
               },
               child: AddButton(height: screenHeight, width: screenWidth),
             ),

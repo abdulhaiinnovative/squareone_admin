@@ -11,10 +11,11 @@ import 'package:squareone_admin/ui/views/home/marketing/marketing_home_view.dart
 import 'package:squareone_admin/dummy_data.dart';
 import '../../../admin_home_screen.dart';
 import '../home/admin/admin_home_view.dart';
-import '../home/head/admin_home/admin_home_view.dart';
+import '../home/head/admin_home/new_admin_home_view.dart';
 import '../home/head/head_home/head_home_view.dart';
 import '../home/maintainance/maintainance_home_view.dart';
 import '../home/security/security_home_view.dart';
+import 'auth_view.dart';
 
 class LoginController extends GetxController {
   TextEditingController emailController = TextEditingController();
@@ -186,12 +187,16 @@ class LoginController extends GetxController {
   /// Logout user
   Future<void> logout() async {
     try {
+
+      emailController.clear();
+      passwordController.clear();
       await auth.signOut();
       storage.erase();
       emailController.clear();
       passwordController.clear();
       Get.snackbar('Logged Out', 'You have been successfully logged out.');
       log('User logged out successfully');
+      Get.offAll(() => LoginView());
     } catch (e) {
       log('Error during logout: $e');
       Get.snackbar('Error', 'Failed to logout. Please try again.');
@@ -200,8 +205,9 @@ class LoginController extends GetxController {
 
   @override
   void onClose() {
-    emailController.dispose();
-    passwordController.dispose();
+    //
+    // emailController.dispose();
+    // passwordController.dispose();
     super.onClose();
   }
 }

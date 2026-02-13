@@ -43,12 +43,14 @@ class _HeadHomeState extends State<HeadHome> {
     log(context.height.toString());
 
     return GetBuilder<HeadHomeController>(
-      init: Get.put<HeadHomeController>(HeadHomeController()),
+      init: Get.find<HeadHomeController>(),
       builder: (controller) {
         return Scaffold(
           body: RefreshIndicator(
             onRefresh: () async {
               await controller.fetchHeadInfo();
+              await controller.fetchDepartmentStaff();
+              await controller.fetchDepartmentEmployees();
               await controller.fetchDepartmentEmployees();
               await controller.fetchTaskStatistics();
             },

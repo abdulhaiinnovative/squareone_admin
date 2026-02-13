@@ -11,6 +11,13 @@ class CardsController extends GetxController {
   GetStorage storage = GetStorage();
   FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
 
+
+  int get totalEmployeesCount {
+    return departmentEmployees
+        .where((e) => (e['role'] ?? '').toString().toLowerCase() == 'employee')
+        .length;
+  }
+
   // User Info
 
   RxString headUid = ''.obs;
@@ -51,6 +58,7 @@ class CardsController extends GetxController {
     fetchHeads();
     fetchDepartments();
     fetchAllEmployees();
+    fetchEmployeesBasedOnRole();
     // 2. Also listen for auth changes (safety net)
     FirebaseAuth.instance.authStateChanges().listen((user) {
       if (user != null && headUid.value.isEmpty) {
@@ -395,6 +403,53 @@ class CardsController extends GetxController {
 
 
   final String _ticketsCollection = 'tickets';  // ← yeh define kar diya
+
+
+  Future<void> fetchEmployeesBasedOnRole() async {
+    try {
+      isLoading.value = true;
+
+      final currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser == null) return;
+
+      final userDoc = await FirebaseFirestore.instance
+          .collection('personnel')
+          .doc(currentUser.uid)
+          .get();
+
+      final userData = userDoc.data();
+      if (userData == null) return;
+
+      final role = userData['role'];
+      final department = userData['department'];
+
+      QuerySnapshot snapshot;
+
+      if (role == 'head') {
+        // ✅ Only employees of THIS department
+        snapshot = await FirebaseFirestore.instance
+            .collection('personnel')
+            .where('department', isEqualTo: department)
+            .where('role', isEqualTo: 'employee')
+            .get();
+      } else {
+        // ✅ Admin → all heads + employees
+        snapshot = await FirebaseFirestore.instance
+            .collection('personnel')
+            .where('role', whereIn: ['head', 'employee'])
+            .get();
+      }
+
+      departmentEmployees.value =
+          snapshot.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
+
+    } catch (e) {
+      print(e);
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
 
 
   Future<void> fetchTaskStatistics() async {

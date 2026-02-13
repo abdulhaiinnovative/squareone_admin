@@ -26,7 +26,8 @@ class HeadViewTickets extends StatelessWidget {
       backgroundColor: Colors.white,
       appBar: AppBar(
         iconTheme: const IconThemeData(color: redColor),
-        elevation: 0,
+        elevation: 5,
+        shadowColor: Colors.black.withOpacity(0.65),
         leading: ButtonBack(height: screenHeight, width: screenWidth),
         title: Text(
           appBarTitle,

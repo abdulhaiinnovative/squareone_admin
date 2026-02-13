@@ -4,6 +4,9 @@ import 'package:squareone_admin/ui/views/forms/add_depart_member/add_depart_memb
 import 'package:squareone_admin/ui/views/home/food_dept/food_dept_view.dart';
 import 'package:squareone_admin/ui/views/home/head/admin_home/admin_home.dart';
 import 'package:squareone_admin/ui/views/home/head/admin_home/admin_notification/new_admin_notification.dart';
+
+import 'package:squareone_admin/ui/views/home/head/head_home/head_profile_view.dart';
+import 'package:squareone_admin/ui/views/home/head/head_home/worker_view.dart';
 import 'package:squareone_admin/ui/views/home/maintainance/maintainance_view.dart';
 import 'package:squareone_admin/ui/views/home/marketing/marketing_view.dart';
 import 'package:squareone_admin/ui/views/home/security/security_view.dart';
@@ -267,6 +270,39 @@ List<SalomonBottomBarItem> adminItems = [
     ),
   ),
 ];
+List<SalomonBottomBarItem> newAdminItems = [
+  SalomonBottomBarItem(
+    icon: const Icon(Icons.home_outlined),
+    title: const Text(
+      'Home',
+      style: TextStyle(
+        fontSize: 13,
+        fontWeight: FontWeight.w400,
+      ),
+    ),
+  ),
+  SalomonBottomBarItem(
+    icon: const Icon(Icons.notifications_none),
+    title: const Text(
+      'Notification',
+      style: TextStyle(
+        fontSize: 13,
+        fontWeight: FontWeight.w400,
+      ),
+    ),
+  ),
+
+  SalomonBottomBarItem(
+    icon: const Icon(Icons.account_circle_outlined),
+    title: const Text(
+      'Profile',
+      style: TextStyle(
+        fontSize: 13,
+        fontWeight: FontWeight.w400,
+      ),
+    ),
+  ),
+];
 
 List<SalomonBottomBarItem> maintainanceItems = [
   SalomonBottomBarItem(
@@ -407,9 +443,9 @@ final adminPages = [
 
 final headPages = [
   const HeadHome(),
-  const TeamAvailabilityDashboard(),
-  const TeamAvailabilityDashboard(),
-  const ProfileView(),
+  const NewAdminNotification(),
+  WorkerView(),
+  const HeadProfileView(),
 ];
 final newAdminPages = [
   const AdminHome(),

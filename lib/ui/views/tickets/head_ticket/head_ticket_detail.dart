@@ -20,7 +20,9 @@ class HeadTicketDetail extends StatelessWidget {
     final String department = ticket['department'] ?? 'Not Found';
     final String status = ticket['status'] ?? 'Unknown';
     final String employeeName = ticket['assignedTo'] ?? 'Unassigned';
+    final String employeeRole = ticket['assignedToRole'] ?? 'Unassigned';
     final String assignBy = ticket['assignedBy'] ?? 'Unassigned';
+    final String assignByRole = ticket['assignedByRole'] ?? 'Role';
     final String dueDate = ticket['dueDate'] ?? 'No due date';
     final String priority = ticket['priority'] ?? 'Normal';
     final String assignedAt = ticket['assignedAt'] ?? 'N/A';
@@ -107,8 +109,10 @@ class HeadTicketDetail extends StatelessWidget {
 
                       /// 🔹 Assignment Info
                       _sectionTitle('Assignment'),
-                      _detailRow('Assigned To', employeeName),
-                      _detailRow('Assigned By', ticket['assignedBy'] ?? 'N/A'),
+                      _detailRow('Assigned To', employeeName + ' (${employeeRole})'),
+                          _detailRow('Assigned By', assignBy + ' (${assignByRole})' ?? 'N/A'),
+
+
                       _detailRow('Assigned At', assignedAt),
 
                       const SizedBox(height: 12),

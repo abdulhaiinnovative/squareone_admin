@@ -8,6 +8,7 @@ import '../../../../component/colors.dart';
 
 class HeadHomeView extends StatelessWidget {
   HeadHomeView({super.key});
+
   final controller = Get.put<AdminHomeController>(AdminHomeController());
 
   @override
